@@ -25,11 +25,12 @@ export default {
       id: "",
       agentVersion: "",
       online: false,
-      imageUrl: ""
+      imageUrl: "",
+      dbs: []
     };
   },
   mounted: function() {
-    this.getIpfsNodeInfo();
+    //this.getIpfsNodeInfo();
   },
   methods: {
     async getIpfsNodeInfo() {
@@ -46,7 +47,7 @@ export default {
         this.status = "Connected to IPFS";
         this.online = this.$root.ipfsNode.isOnline();
 
-        await this.createOrbitDBInstance()
+        await this.setupOrbitDB()
 
         for await (var chunk of this.$root.ipfsNode.cat("QmX2pWKRSBHQAFNG17DR496LRwD251b6cgwJ28fktt2WhG")) {
           var content = [];
@@ -59,8 +60,10 @@ export default {
         this.status = `Error: ${err}`;
       }
     },
-    async createOrbitDBInstance() {
+    async setupOrbitDB() {
       this.$root.orbitDB = await createInstance(this.$root.ipfsNode)
+
+      this.dbs.push(await this.$root.orbitDB.feed("test"))
     }
   }
 };
